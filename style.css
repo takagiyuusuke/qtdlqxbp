@@ -1,11 +1,15 @@
 body {
   font-family: sans-serif;
-  background-color: #f0f0f0;
   text-align: center;
-  padding: 50px;
+  padding: 2rem;
+  background-color: #f0f8ff;
 }
 
-button {
-  font-size: 16px;
-  padding: 10px 20px;
+h1 {
+  margin-bottom: 1rem;
+}
+
+img {
+  border: 1px solid #ccc;
+  margin-top: 1rem;
 }
