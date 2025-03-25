@@ -14,7 +14,7 @@ function getFlareImageInfo() {
   const HH = String(truncated.getHours()).padStart(2, '0');
 
   const folderPath = `${YYYY}/${MM}/${DD}`;
-  const filename = `${YYYY}${MM}${DD}_${HH}0000_M_1k.jpg`;
+  const filename = `${YYYY}${MM}${DD}_${HH}0000_M_512.jpg`;
   const url = `https://jsoc1.stanford.edu/data/hmi/images/${folderPath}/${filename}`;
 
   return {
