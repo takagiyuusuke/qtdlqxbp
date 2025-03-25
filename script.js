@@ -12,7 +12,7 @@ function getFlareImageInfo() {
 
   const folderPath = `${YYYY}/${MM}/${DD}`;
   const filename = `${YYYY}${MM}${DD}_${HH}0000_M_1k.jpg`;
-  const url = `http://jsoc1.stanford.edu/data/hmi/images/2025/03/24/20250325_100000_M_1k.jpg`;
+  const url = `https://jsoc1.stanford.edu/data/hmi/images/2025/03/24/20250325_100000_M_1k.jpg`;
 
   return {
     url,
