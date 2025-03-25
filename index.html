@@ -2,13 +2,17 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>最新の太陽フレア画像</title>
-  <link rel="stylesheet" href="style.css">
+  <title>AIA FITS Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/fitsjs@0.6.0/dist/fits.min.js"></script>
+  <style>
+    body { text-align: center; font-family: sans-serif; padding: 2rem; }
+    canvas { border: 1px solid #ccc; }
+  </style>
 </head>
 <body>
-  <h1>最新の太陽フレア画像</h1>
+  <h1>太陽観測 FITS画像（10時間前）</h1>
   <p id="timestamp"></p>
-  <img id="flareImage" src="" alt="太陽フレア画像" width="512">
+  <canvas id="fitsCanvas" width="512" height="512"></canvas>
   <script src="script.js"></script>
 </body>
 </html>
