@@ -1,14 +1,58 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>demo</title>
-  <link rel="stylesheet" href="style.css">
+  <title>FITS Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/fitsjs@latest/dist/fits.min.js"></script>
+  <style>
+    canvas { border: 1px solid black; }
+  </style>
 </head>
 <body>
-  <h1>HMI画像（12時間前）</h1>
-  <p id="hmi-time"></p>
-  <img id="hmi-image" width="512" alt="HMI Image">
-  <script src="script.js"></script>
+  <h1>FITS Viewer</h1>
+  <canvas id="fits-canvas" width="512" height="512"></canvas>
+  <script>
+    const fitsURL = "https://sdo5.nascom.nasa.gov/data/aia/synoptic/2025/03/28/H1000/AIA20250328_102100_0094.fits";
+    const canvas = document.getElementById("fits-canvas");
+    const ctx = canvas.getContext("2d");
+
+    fetch(fitsURL)
+      .then(response => response.arrayBuffer())
+      .then(buffer => {
+        const fits = new astro.FITS(buffer);
+        const hdu = fits.getHDU();
+        const imageData = hdu.data;
+
+        const width = hdu.header.naxis1;
+        const height = hdu.header.naxis2;
+
+        const image = ctx.createImageData(width, height);
+
+        // FITSのデータは通常16bit〜32bit floatなので、適宜スケーリング
+        const data = imageData;
+        let min = Infinity, max = -Infinity;
+        for (let i = 0; i < data.length; i++) {
+          const value = data[i];
+          if (value < min) min = value;
+          if (value > max) max = value;
+        }
+
+        for (let i = 0; i < data.length; i++) {
+          const scaled = Math.floor(255 * (data[i] - min) / (max - min));
+          image.data[4 * i + 0] = scaled; // R
+          image.data[4 * i + 1] = scaled; // G
+          image.data[4 * i + 2] = scaled; // B
+          image.data[4 * i + 3] = 255;    // A
+        }
+
+        // キャンバスサイズを合わせる
+        canvas.width = width;
+        canvas.height = height;
+        ctx.putImageData(image, 0, 0);
+      })
+      .catch(err => {
+        console.error("Error loading FITS:", err);
+      });
+  </script>
 </body>
 </html>
