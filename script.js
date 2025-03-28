@@ -1,51 +1,94 @@
-function formatDate(date) {
-  const YYYY = date.getFullYear();
-  const MM = String(date.getMonth() + 1).padStart(2, '0');
-  const DD = String(date.getDate()).padStart(2, '0');
-  const HH = String(date.getHours()).padStart(2, '0');
-  const MI = String(date.getMinutes()).padStart(2, '0');
-  return { YYYY, MM, DD, HH, MI };
+const wavelengths = ['0094', '0131', '0171', '0193', '0211', '0304', '0335', '1600', '4500'];
+const aiaBaseURL = 'https://d393-131-113-97-134.ngrok-free.app/fits2png?url=';
+
+// 現在のUTC時刻を1時間切り下げ
+const now = new Date();
+now.setUTCMinutes(0, 0, 0);
+
+// 10時間前〜32時間前の12枚分
+const timestamps = [];
+for (let h = 32; h >= 10; h -= 2) {
+  const t = new Date(now.getTime() - h * 3600 * 1000);
+  timestamps.push(t);
 }
 
-function generateImageUrls() {
-  const urls = [];
-  const now = new Date();
-  now.setHours(now.getHours() - 20); // 20時間前から開始
-  now.setMinutes(0, 0, 0); // 分と秒をリセット
+// AIA URL生成
+const aiaUrls = {};
+wavelengths.forEach(wl => {
+  aiaUrls[wl] = timestamps.map(d => {
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const hour = String(d.getUTCHours()).padStart(2, '0');
+    const ymd = `${year}${month}${day}`;
+    return `${aiaBaseURL}${encodeURIComponent(`https://sdo5.nascom.nasa.gov/data/aia/synoptic/${year}/${month}/${day}/H${hour}00/AIA${ymd}_${hour}0000_${wl}.fits`)}`;
+  });
+});
 
-  for (let i = 20; i >= 10; i--) { // 20時間前から現在までの1時間ごと
-    const { YYYY, MM, DD, HH, MI } = formatDate(now);
-    const url = `https://jsoc1.stanford.edu/data/hmi/images/${YYYY}/${MM}/${DD}/${YYYY}${MM}${DD}_${HH}${MI}00_M_1k.jpg`;
-    urls.push(url);
-    now.setHours(now.getHours() + 1); // 1時間進める
-  }
+// HMI URL生成
+const hmiUrls = timestamps.map(d => {
+  const year = d.getUTCFullYear();
+  const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  const hour = String(d.getUTCHours()).padStart(2, '0');
+  return `http://jsoc1.stanford.edu/data/hmi/images/${year}/${month}/${day}/${year}${month}${day}_${hour}0000_M_1k.jpg`;
+});
 
-  return urls;
-}
+// 画像プリロード
+const preloadedImages = {};  // { "0094-0": Image, ..., "HMI-0": Image }
+wavelengths.forEach(wl => {
+  aiaUrls[wl].forEach((url, i) => {
+    const key = `${wl}-${i}`;
+    const img = new Image();
+    img.src = url;
+    preloadedImages[key] = img;
+  });
+});
+hmiUrls.forEach((url, i) => {
+  const key = `HMI-${i}`;
+  const img = new Image();
+  img.src = url;
+  preloadedImages[key] = img;
+});
 
-function displayAnimatedHMI() {
-  const urls = generateImageUrls();
-  let currentIndex = 0;
+// HTMLに表示エリア追加
+const grid = document.getElementById('aia-grid');
+const timestampLabel = document.getElementById('timestamp');
 
-  function updateImage() {
-    const imageElement = document.getElementById("hmi-image");
-    const timeElement = document.getElementById("hmi-time");
+const imageElements = {};  // { "0094": <img>, ..., "HMI": <img> }
 
-    if (currentIndex >= urls.length) {
-      currentIndex = 0; // ループする
-    }
+// AIA + HMI まとめて描画要素を作る
+[...wavelengths, 'HMI'].forEach(type => {
+  const container = document.createElement('div');
+  container.className = 'channel';
 
-    const now = new Date();
-    now.setHours(now.getHours() - 20 + currentIndex); // 時間を計算
-    now.setMinutes(0, 0, 0); // 分をリセット
+  const label = document.createElement('div');
+  label.textContent = type === 'HMI' ? 'HMI' : `AIA ${type}`;
+  const img = document.createElement('img');
+  img.id = `img-${type}`;
+  container.appendChild(label);
+  container.appendChild(img);
+  grid.appendChild(container);
 
-    imageElement.src = urls[currentIndex];
-    timeElement.textContent = `取得時刻：${now.toLocaleString()}`;
-    currentIndex++;
-  }
+  imageElements[type] = img;
+});
 
-  updateImage(); // 初回表示
-  setInterval(updateImage, 1000); // 1秒ごとに画像を切り替え
-}
+// アニメーション制御
+let frameIndex = 0;
+setInterval(() => {
+  // 表示画像更新
+  wavelengths.forEach(wl => {
+    const key = `${wl}-${frameIndex % timestamps.length}`;
+    imageElements[wl].src = preloadedImages[key].src;
+  });
 
-displayAnimatedHMI();
+  const hmiKey = `HMI-${frameIndex % timestamps.length}`;
+  imageElements['HMI'].src = preloadedImages[hmiKey].src;
+
+  // タイムスタンプ表示更新
+  const t = timestamps[frameIndex % timestamps.length];
+  const timeStr = `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, '0')}-${String(t.getUTCDate()).padStart(2, '0')} ${String(t.getUTCHours()).padStart(2, '0')}:00 UTC`;
+  timestampLabel.textContent = `現在表示中の時刻: ${timeStr}`;
+
+  frameIndex++;
+}, 500);
