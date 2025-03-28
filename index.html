@@ -26,7 +26,7 @@
   <div class="channel">
     <img id="hmi" src="" alt="HMI Image">
   </div>
-
+  <h2 id="timestamp">Loading timestamp...</h2>
   <h1>AIA Animations</h1>
   <div class="grid" id="aia-grid"></div>
 
@@ -64,16 +64,23 @@
       const month = String(d.getUTCMonth() + 1).padStart(2, '0');
       const day = String(d.getUTCDate()).padStart(2, '0');
       const hour = String(d.getUTCHours()).padStart(2, '0');
-      return `https://jsoc1.stanford.edu/data/hmi/browse/${year}/${month}/${day}/${hour}00.jpg`;
+      return `https://jsoc1.stanford.edu/data/hmi/images/${year}/${month}/${day}/${year}${month}${day}_${hour}0000_M_1k.jpg`;
     });
   
     // HMI アニメーション
     const hmiImg = document.getElementById('hmi');
     let hmiIndex = 0;
+    const timestampLabel = document.getElementById('timestamp');
     setInterval(() => {
-      hmiImg.src = hmiUrls[hmiIndex % hmiUrls.length];
+      const index = hmiIndex % timestamps.length;
+      hmiImg.src = hmiUrls[index];
+
+      const t = timestamps[index];
+      const timeStr = `${t.getUTCFullYear()}-${String(t.getUTCMonth()+1).padStart(2, '0')}-${String(t.getUTCDate()).padStart(2, '0')} ${String(t.getUTCHours()).padStart(2, '0')}:00 UTC`;
+      timestampLabel.textContent = `現在表示中の時刻: ${timeStr}`;
+
       hmiIndex++;
-    }, 10000);
+    }, 3000);
   
     // AIA アニメーション
     const aiaGrid = document.getElementById('aia-grid');
@@ -94,7 +101,7 @@
         const fitsURL = aiaUrls[wl][frameIndex % aiaUrls[wl].length];
         img.src = aiaBaseURL + encodeURIComponent(fitsURL);
         frameIndex++;
-      }, 10000);
+      }, 3000);
     });
   </script>
 </body>
