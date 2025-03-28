@@ -45,7 +45,7 @@ function createTransparentImageURL(width = 200, height = 200) {
 
   // テキストのスタイルを指定
   ctx.font = "20px sans-serif";
-  ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // 半透明の白
+  ctx.fillStyle = "rgba(255, 0, 0, 0.7)"; // 半透明の白
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
