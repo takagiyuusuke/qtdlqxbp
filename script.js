@@ -34,22 +34,51 @@ const hmiUrls = timestamps.map(d => {
   return `http://jsoc1.stanford.edu/data/hmi/images/${year}/${month}/${day}/${year}${month}${day}_${hour}0000_M_1k.jpg`;
 });
 
+function createTransparentImageURL(width = 200, height = 200) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  return canvas.toDataURL('image/png');
+}
+
+const transparentURL = createTransparentImageURL();
+
 // 画像プリロード
 const preloadedImages = {};  // { "0094-0": Image, ..., "HMI-0": Image }
+// AIA プリロード
 wavelengths.forEach(wl => {
   aiaUrls[wl].forEach((url, i) => {
     const key = `${wl}-${i}`;
     const img = new Image();
+    img.onload = () => {
+      preloadedImages[key] = img;
+    };
+    img.onerror = () => {
+      const fallback = new Image();
+      fallback.src = transparentURL;
+      preloadedImages[key] = fallback;
+      console.warn(`❌ AIA image failed to load: ${url}`);
+    };
     img.src = url;
-    preloadedImages[key] = img;
   });
 });
+
+// HMI プリロード
 hmiUrls.forEach((url, i) => {
   const key = `HMI-${i}`;
   const img = new Image();
+  img.onload = () => {
+    preloadedImages[key] = img;
+  };
+  img.onerror = () => {
+    const fallback = new Image();
+    fallback.src = transparentURL;
+    preloadedImages[key] = fallback;
+    console.warn(`❌ HMI image failed to load: ${url}`);
+  };
   img.src = url;
-  preloadedImages[key] = img;
 });
+
 
 // HTMLに表示エリア追加
 const grid = document.getElementById('aia-grid');
