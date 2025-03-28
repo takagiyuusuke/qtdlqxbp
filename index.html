@@ -64,7 +64,7 @@
       const month = String(d.getUTCMonth() + 1).padStart(2, '0');
       const day = String(d.getUTCDate()).padStart(2, '0');
       const hour = String(d.getUTCHours()).padStart(2, '0');
-      return `https://jsoc.stanford.edu/data/hmi/browse/${year}/${month}/${day}/${hour}00.jpg`;
+      return `https://jsoc1.stanford.edu/data/hmi/browse/${year}/${month}/${day}/${hour}00.jpg`;
     });
   
     // HMI アニメーション
@@ -94,7 +94,7 @@
         const fitsURL = aiaUrls[wl][frameIndex % aiaUrls[wl].length];
         img.src = aiaBaseURL + encodeURIComponent(fitsURL);
         frameIndex++;
-      }, 1000);
+      }, 10000);
     });
   </script>
 </body>
