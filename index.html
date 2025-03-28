@@ -8,7 +8,7 @@
   <img id="fits-image" width="512" height="512">
   <script>
     const fitsURL = "https://sdo5.nascom.nasa.gov/data/aia/synoptic/2025/03/28/H1000/AIA20250328_102100_0094.fits";
-    const apiURL = `https://c3df-131-113-97-134.ngrok-free.app/fits2png?url=${encodeURIComponent(fitsURL)}`;
+    const apiURL = `http://127.0.0.1:4040/fits2png?url=${encodeURIComponent(fitsURL)}`;
 
     fetch(apiURL)
       .then(res => res.blob())
