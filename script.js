@@ -10,14 +10,14 @@ function formatDate(date) {
 function generateImageUrls() {
   const urls = [];
   const now = new Date();
-  now.setHours(now.getHours() - 15); // 15時間前から開始
+  now.setHours(now.getHours() - 20); // 20時間前から開始
   now.setMinutes(0, 0, 0); // 分と秒をリセット
 
-  for (let i = 0; i <= 10; i++) { // 15時間前から10時間前までの30分ごと
+  for (let i = 20; i >= 10; i--) { // 20時間前から現在までの1時間ごと
     const { YYYY, MM, DD, HH, MI } = formatDate(now);
     const url = `https://jsoc1.stanford.edu/data/hmi/images/${YYYY}/${MM}/${DD}/${YYYY}${MM}${DD}_${HH}${MI}00_M_1k.jpg`;
     urls.push(url);
-    now.setMinutes(now.getMinutes() + 30); // 30分進める
+    now.setHours(now.getHours() + 1); // 1時間進める
   }
 
   return urls;
@@ -36,8 +36,8 @@ function displayAnimatedHMI() {
     }
 
     const now = new Date();
-    now.setHours(now.getHours() - 15 + Math.floor(currentIndex / 2)); // 時間を計算
-    now.setMinutes((currentIndex % 2) * 30, 0, 0); // 分を計算
+    now.setHours(now.getHours() - 20 + currentIndex); // 時間を計算
+    now.setMinutes(0, 0, 0); // 分をリセット
 
     imageElement.src = urls[currentIndex];
     timeElement.textContent = `取得時刻：${now.toLocaleString()}`;
