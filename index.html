@@ -33,16 +33,19 @@
   <script>
     const wavelengths = ['0094', '0131', '0171', '0193', '0211', '0304', '0335', '1600', '1700', '4500'];
     const aiaBaseURL = 'https://d393-131-113-97-134.ngrok-free.app/fits2png?url=';
-
-    // 現在のUTCから時間列を生成（20時間前〜10時間前の毎時）
-    const timestamps = [];
+  
+    // ① 現在のUTCを1時間切り下げる
     const now = new Date();
+    now.setUTCMinutes(0, 0, 0); // 分・秒・ミリ秒をゼロに
+  
+    // ② 10時間前〜20時間前の時刻リストを生成
+    const timestamps = [];
     for (let h = 20; h >= 10; h--) {
-      const d = new Date(now.getTime() - h * 3600 * 1000);
-      timestamps.push(new Date(d));  // コピー
+      const t = new Date(now.getTime() - h * 3600 * 1000);
+      timestamps.push(t);
     }
-
-    // AIA URLリストを波長ごとに作成
+  
+    // ③ AIA URLリスト
     const aiaUrls = {};
     wavelengths.forEach(wl => {
       aiaUrls[wl] = timestamps.map(d => {
@@ -51,34 +54,33 @@
         const day = String(d.getUTCDate()).padStart(2, '0');
         const hour = String(d.getUTCHours()).padStart(2, '0');
         const ymd = `${year}${month}${day}`;
-        return `https://sdo5.nascom.nasa.gov/data/aia/synoptic/${year}/${month}/${day}/H0000/AIA${ymd}_${hour}0000_${wl}.fits`;
+        return `https://sdo5.nascom.nasa.gov/data/aia/synoptic/${year}/${month}/${day}/H${hour}00/AIA${ymd}_${hour}0000_${wl}.fits`;
       });
     });
-
-    // HMI URLリストを作成
+  
+    // ④ HMI URLリスト
     const hmiUrls = timestamps.map(d => {
       const year = d.getUTCFullYear();
       const month = String(d.getUTCMonth() + 1).padStart(2, '0');
       const day = String(d.getUTCDate()).padStart(2, '0');
       const hour = String(d.getUTCHours()).padStart(2, '0');
-      const minute = '00';
-      return `https://jsoc.stanford.edu/data/hmi/browse/${year}/${month}/${day}/${hour}${minute}.jpg`;
+      return `https://jsoc.stanford.edu/data/hmi/browse/${year}/${month}/${day}/${hour}00.jpg`;
     });
-
+  
     // HMI アニメーション
     const hmiImg = document.getElementById('hmi');
     let hmiIndex = 0;
     setInterval(() => {
       hmiImg.src = hmiUrls[hmiIndex % hmiUrls.length];
       hmiIndex++;
-    }, 1000); // 1秒ごとに更新
-
+    }, 1000);
+  
     // AIA アニメーション
     const aiaGrid = document.getElementById('aia-grid');
     wavelengths.forEach(wl => {
       const container = document.createElement('div');
       container.className = 'channel';
-
+  
       const label = document.createElement('div');
       label.textContent = `AIA ${wl}`;
       const img = document.createElement('img');
@@ -86,13 +88,13 @@
       container.appendChild(label);
       container.appendChild(img);
       aiaGrid.appendChild(container);
-
+  
       let frameIndex = 0;
       setInterval(() => {
         const fitsURL = aiaUrls[wl][frameIndex % aiaUrls[wl].length];
         img.src = aiaBaseURL + encodeURIComponent(fitsURL);
         frameIndex++;
-      }, 1000); // 1秒ごとに更新
+      }, 1000);
     });
   </script>
 </body>
