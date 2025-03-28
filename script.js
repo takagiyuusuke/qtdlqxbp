@@ -38,8 +38,22 @@ function createTransparentImageURL(width = 200, height = 200) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
+
+  const ctx = canvas.getContext('2d');
+
+  // 背景は完全透明なので塗らなくてOK
+
+  // テキストのスタイルを指定
+  ctx.font = "20px sans-serif";
+  ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // 半透明の白
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.fillText("No data", width / 2, height / 2);
+
   return canvas.toDataURL('image/png');
 }
+
 
 const transparentURL = createTransparentImageURL();
 
