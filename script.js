@@ -31,7 +31,7 @@ const hmiUrls = timestamps.map(d => {
   const month = String(d.getUTCMonth() + 1).padStart(2, '0');
   const day = String(d.getUTCDate()).padStart(2, '0');
   const hour = String(d.getUTCHours()).padStart(2, '0');
-  return `http://jsoc1.stanford.edu/data/hmi/images/${year}/${month}/${day}/${year}${month}${day}_${hour}0000_M_1k.jpg`;
+  return `https://jsoc1.stanford.edu/data/hmi/images/${year}/${month}/${day}/${year}${month}${day}_${hour}0000_M_1k.jpg`;
 });
 
 function createTransparentImageURL(width = 200, height = 200) {
