@@ -1,24 +1,99 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>FITS Viewer</title>
+  <meta charset="UTF-8">
+  <title>SDO Viewer</title>
+  <style>
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+    .channel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    img {
+      width: 200px;
+      height: 200px;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-  <h2>FITS 画像</h2>
-  <img id="fits-image" width="512" height="512">
+  <h1>HMI Animation</h1>
+  <div class="channel">
+    <img id="hmi" src="" alt="HMI Image">
+  </div>
+
+  <h1>AIA Animations</h1>
+  <div class="grid" id="aia-grid"></div>
+
   <script>
-    const fitsURL = "https://sdo5.nascom.nasa.gov/data/aia/synoptic/2025/03/28/H1000/AIA20250328_102100_0094.fits";
-    const apiURL = `https://d393-131-113-97-134.ngrok-free.app/fits2png?url=${encodeURIComponent(fitsURL)}`;
-    fetch(apiURL, {
-      headers: {
-        "ngrok-skip-browser-warning": "true"
-      }
-    })
-    .then(res => res.blob())
-    .then(blob => {
-      document.getElementById("fits-image").src = URL.createObjectURL(blob);
-    })
-    .catch(err => console.error("Fetch error:", err));
+    const wavelengths = ['0094', '0131', '0171', '0193', '0211', '0304', '0335', '1600', '1700', '4500'];
+    const aiaBaseURL = 'https://d393-131-113-97-134.ngrok-free.app/fits2png?url=';
+
+    // 現在のUTCから時間列を生成（20時間前〜10時間前の毎時）
+    const timestamps = [];
+    const now = new Date();
+    for (let h = 20; h >= 10; h--) {
+      const d = new Date(now.getTime() - h * 3600 * 1000);
+      timestamps.push(new Date(d));  // コピー
+    }
+
+    // AIA URLリストを波長ごとに作成
+    const aiaUrls = {};
+    wavelengths.forEach(wl => {
+      aiaUrls[wl] = timestamps.map(d => {
+        const year = d.getUTCFullYear();
+        const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(d.getUTCDate()).padStart(2, '0');
+        const hour = String(d.getUTCHours()).padStart(2, '0');
+        const ymd = `${year}${month}${day}`;
+        return `https://sdo5.nascom.nasa.gov/data/aia/synoptic/${year}/${month}/${day}/H0000/AIA${ymd}_${hour}0000_${wl}.fits`;
+      });
+    });
+
+    // HMI URLリストを作成
+    const hmiUrls = timestamps.map(d => {
+      const year = d.getUTCFullYear();
+      const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      const hour = String(d.getUTCHours()).padStart(2, '0');
+      const minute = '00';
+      return `https://jsoc.stanford.edu/data/hmi/browse/${year}/${month}/${day}/${hour}${minute}.jpg`;
+    });
+
+    // HMI アニメーション
+    const hmiImg = document.getElementById('hmi');
+    let hmiIndex = 0;
+    setInterval(() => {
+      hmiImg.src = hmiUrls[hmiIndex % hmiUrls.length];
+      hmiIndex++;
+    }, 1000); // 1秒ごとに更新
+
+    // AIA アニメーション
+    const aiaGrid = document.getElementById('aia-grid');
+    wavelengths.forEach(wl => {
+      const container = document.createElement('div');
+      container.className = 'channel';
+
+      const label = document.createElement('div');
+      label.textContent = `AIA ${wl}`;
+      const img = document.createElement('img');
+      img.id = `aia-${wl}`;
+      container.appendChild(label);
+      container.appendChild(img);
+      aiaGrid.appendChild(container);
+
+      let frameIndex = 0;
+      setInterval(() => {
+        const fitsURL = aiaUrls[wl][frameIndex % aiaUrls[wl].length];
+        img.src = aiaBaseURL + encodeURIComponent(fitsURL);
+        frameIndex++;
+      }, 1000); // 1秒ごとに更新
+    });
   </script>
 </body>
 </html>
