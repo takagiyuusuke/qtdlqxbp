@@ -1,5 +1,6 @@
 const wavelengths = ['0094', '0131', '0171', '0193', '0211', '0304', '0335', '1600', '4500'];
-const aiaBaseURL = 'https://hobbies-da-cathedral-collections.trycloudflare.com/fits2png?url=';
+const aiaBaseURL = 'https://hobbies-da-cathedral-collections.trycloudflare.com/get_aia?demo=true&url=';
+const hmiBaseURL = 'https://hobbies-da-cathedral-collections.trycloudflare.com/get_hmi?demo=true&url=';
 
 // 現在のUTC時刻を1時間切り下げ
 const now = new Date();
@@ -31,7 +32,7 @@ const hmiUrls = timestamps.map(d => {
   const month = String(d.getUTCMonth() + 1).padStart(2, '0');
   const day = String(d.getUTCDate()).padStart(2, '0');
   const hour = String(d.getUTCHours()).padStart(2, '0');
-  return `https://jsoc1.stanford.edu/data/hmi/images/${year}/${month}/${day}/${year}${month}${day}_${hour}0000_M_1k.jpg`;
+  return `${hmiBaseURL}${encodeURIComponent(`https://jsoc1.stanford.edu/data/hmi/images/${year}/${month}/${day}/${year}${month}${day}_${hour}0000_M_1k.jpg`)}`;
 });
 
 function createTransparentImageURL(width = 200, height = 200) {
