@@ -2,6 +2,7 @@
 const wavelengths = ['0094', '0131', '0171', '0193', '0211', '0304', '0335', '1600', '4500'];
 const aiaBaseURL = 'https://hobbies-da-cathedral-collections.trycloudflare.com/get_aia?demo=true&url=';
 const hmiBaseURL = 'https://hobbies-da-cathedral-collections.trycloudflare.com/get_hmi?demo=true&url=';
+const flareBaseURL = 'https://hobbies-da-cathedral-collections.trycloudflare.com/get_flare_class?url=';
 
 // ========== 初期化処理 ==========
 window.addEventListener('DOMContentLoaded', () => {
@@ -18,24 +19,21 @@ function populateTimeSelectors() {
   const now = new Date();
   now.setUTCMinutes(0, 0, 0);
 
-  // 年
   const yearSelect = document.getElementById('year');
   for (let y = 2011; y <= now.getUTCFullYear(); y++) {
     yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
   }
   yearSelect.value = now.getUTCFullYear();
 
-  // 月
   const monthSelect = document.getElementById('month');
   for (let m = 1; m <= 12; m++) {
     monthSelect.innerHTML += `<option value="${m}">${m}</option>`;
   }
   monthSelect.value = now.getUTCMonth() + 1;
 
-  // 日
   updateDaySelector();
   const daySelect = document.getElementById('day');
-  daySelect.value = now.getUTCDate(); // 現在の日付を設定
+  daySelect.value = now.getUTCDate();
   document.getElementById('year').addEventListener('change', () => {
     updateDaySelector();
     updateHourSelector();
@@ -46,7 +44,6 @@ function populateTimeSelectors() {
   });
   document.getElementById('day').addEventListener('change', updateHourSelector);
 
-  // 時間
   updateHourSelector();
 }
 
@@ -88,10 +85,10 @@ function updateHourSelector() {
   hourSelect.value = Math.min(currentValue, 23);
 }
 
-// ========== ロジック本体 ==========
-let preloadedImages = {};  // 全画像キャッシュ
+let preloadedImages = {};
+let preloadedFlareClasses = [];
 let timestamps = [];
-let imageElements = {};  // 各波長のimgタグ
+let imageElements = {};
 let frameIndex = 0;
 let animationTimer = null;
 
@@ -108,14 +105,12 @@ function loadImagesFromSelectedTime() {
 
   const baseTime = new Date(Date.UTC(year, month - 1, day, hour));
 
-  // 1時間ごと11枚生成（-22h 〜 0h）
   timestamps = [];
   for (let h = 22; h >= 0; h -= 2) {
     const t = new Date(baseTime.getTime() - h * 3600 * 1000);
     timestamps.push(t);
   }
 
-  // URL生成
   const aiaUrls = {};
   const hmiUrls = [];
   wavelengths.forEach(wl => {
@@ -139,8 +134,8 @@ function loadImagesFromSelectedTime() {
     return `${hmiBaseURL}${encodeURIComponent(`http://jsoc1.stanford.edu/data/hmi/images/${y}/${m}/${day}/${y}${m}${day}_${h}0000_M_1k.jpg`)}`;
   }));
 
-  // 画像キャッシュ初期化
   preloadedImages = {};
+  preloadedFlareClasses = [];
 
   const transparentURL = createTransparentImageURL();
 
@@ -172,7 +167,22 @@ function loadImagesFromSelectedTime() {
     img.src = url;
   });
 
-  renderImages();
+  // フレア強度データプリロード
+  Promise.all(
+    timestamps.map(t => {
+      const y = t.getUTCFullYear();
+      const m = String(t.getUTCMonth() + 1).padStart(2, '0');
+      const d = String(t.getUTCDate()).padStart(2, '0');
+      const url = `${flareBaseURL}${encodeURIComponent(`https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/goes/goes16/l2/data/xrsf-l2-avg1m_science/${y}/${m}/sci_xrsf-l2-avg1m_g16_d${y}${m}${d}_v2-2-0.nc`)}`;
+      return fetch(url)
+        .then(res => res.ok ? res.json() : { flare_class: "?" })
+        .then(json => json.flare_class || "?")
+        .catch(() => "?");
+    })
+  ).then(results => {
+    preloadedFlareClasses = results;
+    renderImages();
+  });
 }
 
 function createTransparentImageURL(width = 200, height = 200) {
@@ -190,7 +200,7 @@ function createTransparentImageURL(width = 200, height = 200) {
 
 function renderImages() {
   const grid = document.getElementById('aia-grid');
-  grid.innerHTML = ''; // 既存をクリア
+  grid.innerHTML = '';
   imageElements = {};
 
   [...wavelengths, 'HMI'].forEach(type => {
@@ -208,20 +218,31 @@ function renderImages() {
     imageElements[type] = img;
   });
 
-  frameIndex = 0;
   const timestampLabel = document.getElementById('timestamp');
+  let flareLabel = document.getElementById('flare-class');
+  if (!flareLabel) {
+    flareLabel = document.createElement('h2');
+    flareLabel.id = 'flare-class';
+    document.body.insertBefore(flareLabel, grid);
+  }
+
+  frameIndex = 0;
   animationTimer = setInterval(() => {
+    const idx = frameIndex % timestamps.length;
     wavelengths.forEach(wl => {
-      const key = `${wl}-${frameIndex % timestamps.length}`;
+      const key = `${wl}-${idx}`;
       if (preloadedImages[key]) imageElements[wl].src = preloadedImages[key].src;
     });
 
-    const hmiKey = `HMI-${frameIndex % timestamps.length}`;
+    const hmiKey = `HMI-${idx}`;
     if (preloadedImages[hmiKey]) imageElements['HMI'].src = preloadedImages[hmiKey].src;
 
-    const t = timestamps[frameIndex % timestamps.length];
+    const t = timestamps[idx];
     const timeStr = `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, '0')}-${String(t.getUTCDate()).padStart(2, '0')} ${String(t.getUTCHours()).padStart(2, '0')}:00 UTC`;
     timestampLabel.textContent = `現在表示中の時刻: ${timeStr}`;
+
+    const flareStr = preloadedFlareClasses[idx] || "?";
+    flareLabel.textContent = `フレアクラス: ${flareStr}`;
 
     frameIndex++;
   }, 500);
