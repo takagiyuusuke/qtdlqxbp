@@ -21,7 +21,7 @@ function populateTimeSelectors() {
 
   // 年
   const yearSelect = document.getElementById('year');
-  for (let y = 2020; y <= now.getUTCFullYear(); y++) {
+  for (let y = 2011; y <= now.getUTCFullYear(); y++) {
     yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
   }
   yearSelect.value = now.getUTCFullYear();
@@ -107,7 +107,10 @@ function loadImagesFromSelectedTime() {
       const day = String(d.getUTCDate()).padStart(2, '0');
       const h = String(d.getUTCHours()).padStart(2, '0');
       const ymd = `${y}${m}${day}`;
-      return `${aiaBaseURL}${encodeURIComponent(`https://sdo5.nascom.nasa.gov/data/aia/synoptic/${y}/${m}/${day}/H${h}00/AIA${ymd}_${h}0000_${wl}.fits`)}`;
+      if (y >= 2023)
+        return `${aiaBaseURL}${encodeURIComponent(`https://sdo5.nascom.nasa.gov/data/aia/synoptic/${y}/${m}/${day}/H${h}00/AIA${ymd}_${h}0000_${wl}.fits`)}`;
+      else
+        return `${aiaBaseURL}${encodeURIComponent(`https://jsoc1.stanford.edu/data/aia/synoptic/${y}/${m}/${day}/H${h}00/AIA${ymd}_${h}00_${wl}.fits`)}`;
     });
   });
   hmiUrls.push(...timestamps.map(d => {
