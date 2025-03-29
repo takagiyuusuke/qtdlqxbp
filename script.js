@@ -71,8 +71,15 @@ function isTodaySelected(now) {
 let preloadedImages = {};  // 全画像キャッシュ
 let timestamps = [];
 let imageElements = {};  // 各波長のimgタグ
+let frameIndex = 0;
+let animationTimer = null;
 
 function loadImagesFromSelectedTime() {
+  if (animationTimer) {
+    clearInterval(animationTimer);
+    animationTimer = null;
+  }
+
   const year = parseInt(document.getElementById('year').value);
   const month = parseInt(document.getElementById('month').value);
   const day = parseInt(document.getElementById('day').value);
@@ -177,10 +184,9 @@ function renderImages() {
     imageElements[type] = img;
   });
 
-  // アニメーション開始
-  let frameIndex = 0;
+  frameIndex = 0;
   const timestampLabel = document.getElementById('timestamp');
-  setInterval(() => {
+  animationTimer = setInterval(() => {
     wavelengths.forEach(wl => {
       const key = `${wl}-${frameIndex % timestamps.length}`;
       if (preloadedImages[key]) imageElements[wl].src = preloadedImages[key].src;
