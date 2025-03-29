@@ -6,7 +6,7 @@ const timestamps = [];
 // 現在時刻をUTCで1時間切り下げ
 const now = new Date();
 now.setUTCMinutes(0, 0, 0);
-for (let h = 20; h >= 10; h--) {
+for (let h = 32; h >= 10; h-=2) {
   const t = new Date(now.getTime() - h * 3600 * 1000);
   timestamps.push(t.toISOString());
 }
