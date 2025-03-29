@@ -1,5 +1,5 @@
 const wavelengths = ['0094', '0131', '0171', '0193', '0211', '0304', '0335', '1600', '4500'];
-const aiaBaseURL = 'https://d393-131-113-97-134.ngrok-free.app/fits2png?url=';
+const aiaBaseURL = 'https://01d4-131-113-97-134.ngrok-free.app/fits2png?url=';
 
 // 現在のUTC時刻を1時間切り下げ
 const now = new Date();
