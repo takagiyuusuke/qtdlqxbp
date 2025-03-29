@@ -20,7 +20,7 @@ function populateTimeSelectors() {
 
   // 年
   const yearSelect = document.getElementById('year');
-  for (let y = 2020; y <= now.getUTCFullYear(); y++) {
+  for (let y = 2011; y <= now.getUTCFullYear(); y++) {
     yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
   }
   yearSelect.value = now.getUTCFullYear();
