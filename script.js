@@ -7,7 +7,7 @@ now.setUTCMinutes(0, 0, 0);
 
 // 10時間前〜32時間前の12枚分
 const timestamps = [];
-for (let h = 32; h >= 10; h -= 2) {
+for (let h = 23; h >= 1; h -= 2) {
   const t = new Date(now.getTime() - h * 3600 * 1000);
   timestamps.push(t);
 }
