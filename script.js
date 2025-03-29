@@ -17,11 +17,10 @@ window.addEventListener('DOMContentLoaded', () => {
 function populateTimeSelectors() {
   const now = new Date();
   now.setUTCMinutes(0, 0, 0);
-  const maxHour = now.getUTCHours() - ((now.getUTCMinutes() >= 30) ? 0 : 1);
 
   // 年
   const yearSelect = document.getElementById('year');
-  for (let y = 2011; y <= now.getUTCFullYear(); y++) {
+  for (let y = 2020; y <= now.getUTCFullYear(); y++) {
     yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
   }
   yearSelect.value = now.getUTCFullYear();
@@ -35,19 +34,18 @@ function populateTimeSelectors() {
 
   // 日
   updateDaySelector();
-  const daySelect = document.getElementById('day');
-  daySelect.value = now.getUTCDate(); // 現在の日付を設定
-  
-  document.getElementById('year').addEventListener('change', updateDaySelector);
-  document.getElementById('month').addEventListener('change', updateDaySelector);
+  document.getElementById('year').addEventListener('change', () => {
+    updateDaySelector();
+    updateHourSelector();
+  });
+  document.getElementById('month').addEventListener('change', () => {
+    updateDaySelector();
+    updateHourSelector();
+  });
+  document.getElementById('day').addEventListener('change', updateHourSelector);
 
   // 時間
-  const hourSelect = document.getElementById('hour');
-  for (let h = 0; h <= 23; h++) {
-    const disabled = (h > maxHour && isTodaySelected(now)) ? 'disabled' : '';
-    hourSelect.innerHTML += `<option value="${h}" ${disabled}>${h}</option>`;
-  }
-  hourSelect.value = Math.max(0, maxHour);
+  updateHourSelector();
 }
 
 function updateDaySelector() {
@@ -64,10 +62,28 @@ function updateDaySelector() {
   daySelect.value = Math.min(prevDay, daysInMonth);
 }
 
-function isTodaySelected(now) {
-  return parseInt(document.getElementById('year').value) === now.getUTCFullYear() &&
-         parseInt(document.getElementById('month').value) === now.getUTCMonth() + 1 &&
-         parseInt(document.getElementById('day').value) === now.getUTCDate();
+function updateHourSelector() {
+  const now = new Date();
+  now.setUTCMinutes(0, 0, 0);
+  const maxHour = now.getUTCHours() - ((now.getUTCMinutes() >= 30) ? 0 : 1);
+
+  const selectedYear = parseInt(document.getElementById('year').value);
+  const selectedMonth = parseInt(document.getElementById('month').value);
+  const selectedDay = parseInt(document.getElementById('day').value);
+
+  const isToday = selectedYear === now.getUTCFullYear() &&
+                  selectedMonth === now.getUTCMonth() + 1 &&
+                  selectedDay === now.getUTCDate();
+
+  const hourSelect = document.getElementById('hour');
+  const currentValue = parseInt(hourSelect.value) || 0;
+  hourSelect.innerHTML = '';
+
+  for (let h = 0; h <= 23; h++) {
+    const disabled = (isToday && h > maxHour) ? 'disabled' : '';
+    hourSelect.innerHTML += `<option value="${h}" ${disabled}>${h}</option>`;
+  }
+  hourSelect.value = Math.min(currentValue, 23);
 }
 
 // ========== ロジック本体 ==========
