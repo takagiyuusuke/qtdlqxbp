@@ -34,6 +34,8 @@ function populateTimeSelectors() {
 
   // 日
   updateDaySelector();
+  const daySelect = document.getElementById('day');
+  daySelect.value = now.getUTCDate(); // 現在の日付を設定
   document.getElementById('year').addEventListener('change', () => {
     updateDaySelector();
     updateHourSelector();
