@@ -6,7 +6,24 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>直近の太陽画像</h1>
+  <h1>SDO Animation Viewer</h1>
+
+  <div>
+    <label for="year">Year:</label>
+    <select id="year"></select>
+
+    <label for="month">Month:</label>
+    <select id="month"></select>
+
+    <label for="day">Day:</label>
+    <select id="day"></select>
+
+    <label for="hour">Hour (UTC):</label>
+    <select id="hour"></select>
+
+    <button id="load-button">この時刻で読み込む</button>
+  </div>
+
   <h2 id="timestamp">Loading timestamp...</h2>
 
   <div class="grid" id="aia-grid"></div>
