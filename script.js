@@ -108,9 +108,9 @@ function loadImagesFromSelectedTime() {
 
   const baseTime = new Date(Date.UTC(year, month - 1, day, hour));
 
-  // 1時間ごと11枚生成（-22h 〜 -2h）
+  // 1時間ごと11枚生成（-22h 〜 0h）
   timestamps = [];
-  for (let h = 22; h >= 2; h -= 2) {
+  for (let h = 22; h >= 0; h -= 2) {
     const t = new Date(baseTime.getTime() - h * 3600 * 1000);
     timestamps.push(t);
   }
