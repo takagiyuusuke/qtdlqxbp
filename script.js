@@ -202,6 +202,8 @@ function loadImagesFromSelectedTime() {
       if (window.flareChartInstance) {
         window.flareChartInstance.data.labels = labels;
         window.flareChartInstance.data.datasets[0].data = flareData;
+        window.flareChartInstance.data.datasets[0].pointBackgroundColor = pointColors;
+        
         window.flareChartInstance.update();
       } else {
         window.flareChartInstance = new Chart(ctx, {
