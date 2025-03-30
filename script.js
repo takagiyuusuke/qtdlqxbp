@@ -191,6 +191,13 @@ function loadImagesFromSelectedTime() {
 
       const labels = Array.from({ length: 72 }, (_, i) => `+${i}h`);
       const ctx = document.getElementById('flareChart').getContext('2d');
+      const pointColors = flareData.map(value => {
+        if (value == null) return 'gray'; // 欠損
+        if (value < 1e-6) return 'blue';  // O（A/B）
+        if (value < 1e-5) return 'green'; // C
+        if (value < 1e-4) return 'orange';// M
+        return 'red';                     // X
+      });
 
       if (window.flareChartInstance) {
         window.flareChartInstance.data.labels = labels;
