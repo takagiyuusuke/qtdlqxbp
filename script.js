@@ -239,6 +239,85 @@ function loadImagesFromSelectedTime() {
                     return `Flux: ${v} W/m² (Class ${cls})`;
                   }
                 }
+              },
+              annotation: {
+                annotations: {
+                  flareBands: {
+                    type: 'box',
+                    yMin: 1e-4,
+                    yMax: 1e-3,
+                    backgroundColor: 'rgba(255,0,0,0.05)',
+                    label: {
+                      enabled: true,
+                      content: 'X',
+                      position: 'start',
+                      xAdjust: 50,
+                      backgroundColor: 'transparent',
+                      color: 'red',
+                      font: { weight: 'bold', size: 14 }
+                    }
+                  },
+                  flareBandM: {
+                    type: 'box',
+                    yMin: 1e-5,
+                    yMax: 1e-4,
+                    backgroundColor: 'rgba(255,165,0,0.05)',
+                    label: {
+                      enabled: true,
+                      content: 'M',
+                      position: 'start',
+                      xAdjust: 50,
+                      backgroundColor: 'transparent',
+                      color: 'orange',
+                      font: { weight: 'bold', size: 14 }
+                    }
+                  },
+                  flareBandC: {
+                    type: 'box',
+                    yMin: 1e-6,
+                    yMax: 1e-5,
+                    backgroundColor: 'rgba(0,255,0,0.05)',
+                    label: {
+                      enabled: true,
+                      content: 'C',
+                      position: 'start',
+                      xAdjust: 50,
+                      backgroundColor: 'transparent',
+                      color: 'green',
+                      font: { weight: 'bold', size: 14 }
+                    }
+                  },
+                  flareBandO: {
+                    type: 'box',
+                    yMin: 1e-9,
+                    yMax: 1e-6,
+                    backgroundColor: 'rgba(0,0,255,0.05)',
+                    label: {
+                      enabled: true,
+                      content: 'O',
+                      position: 'start',
+                      xAdjust: 50,
+                      backgroundColor: 'transparent',
+                      color: 'blue',
+                      font: { weight: 'bold', size: 14 }
+                    }
+                  },
+                  zeroHourLine: {
+                    type: 'line',
+                    scaleID: 'x',
+                    value: 24, // 0h はインデックス24番目
+                    borderColor: 'black',
+                    borderWidth: 3,
+                    label: {
+                      enabled: true,
+                      content: '0h',
+                      position: 'end',
+                      backgroundColor: 'black',
+                      color: 'white',
+                      font: { weight: 'bold', size: 12 }
+                    }
+                  }
+                }
               }
             }
           },
