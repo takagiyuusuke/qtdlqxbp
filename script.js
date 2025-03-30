@@ -310,7 +310,9 @@ function loadImagesFromSelectedTime() {
                     borderWidth: 3,
                     label: {
                       enabled: true,
-                      content: `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, '0')}-${String(t.getUTCDate()).padStart(2, '0')} ${String(t.getUTCHours()).padStart(2, '0')}:00 UTC`,
+                      content: timestamps.length > 0 
+                      ? `${timestamps[timestamps.length - 1].getUTCFullYear()}-${String(timestamps[timestamps.length - 1].getUTCMonth() + 1).padStart(2, '0')}-${String(timestamps[timestamps.length - 1].getUTCDate()).padStart(2, '0')} ${String(timestamps[timestamps.length - 1].getUTCHours()).padStart(2, '0')}:00 UTC`
+                      : '0h', // timestamps が空の場合のフォールバック
                       position: 'end',
                       backgroundColor: 'black',
                       color: 'white',
