@@ -174,6 +174,54 @@ function loadImagesFromSelectedTime() {
   });
 
   renderImages();
+
+  const tY = baseTime.getUTCFullYear();
+  const tM = String(baseTime.getUTCMonth() + 1).padStart(2, '0');
+  const tD = String(baseTime.getUTCDate()).padStart(2, '0');
+  const tH = String(baseTime.getUTCHours()).padStart(2, '0');
+  const flareTimeStr = `${tY}${tM}${tD}${tH}`;
+
+  fetch(`${flareBaseURL}${flareTimeStr}`)
+    .then(res => res.json())
+    .then(flareData => {
+      if (!Array.isArray(flareData)) {
+        console.error("フレアデータ取得エラー:", flareData);
+        return;
+      }
+
+      const labels = Array.from({ length: 72 }, (_, i) => `+${i}h`);
+      const ctx = document.getElementById('flareChart').getContext('2d');
+
+      if (window.flareChartInstance) {
+        window.flareChartInstance.data.labels = labels;
+        window.flareChartInstance.data.datasets[0].data = flareData;
+        window.flareChartInstance.update();
+      } else {
+        window.flareChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'X-ray Flux (0.1–0.8 nm)',
+              data: flareData,
+              borderColor: 'orange',
+              fill: false
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                type: 'logarithmic',
+                title: { display: true, text: 'Flux (W/m²)' }
+              }
+            }
+          }
+        });
+      }
+    })
+    .catch(err => {
+      console.error("フレアデータ取得中にエラー:", err);
+    });
 }
 
 function createTransparentImageURL(width = 200, height = 200) {
