@@ -318,10 +318,10 @@ function renderImages() {
     const timeStr = `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, '0')}-${String(t.getUTCDate()).padStart(2, '0')} ${String(t.getUTCHours()).padStart(2, '0')}:00 UTC`;
     timestampLabel.textContent = `現在表示中の時刻: ${timeStr}`;
 
-    if (window/flareChartInstance) {
+    if (window.flareChartInstance) {
       const dataset = window.flareChartInstance.data.datasets[0];
       dataset.pointRadius = Array(96).fill(2);
-      const hourOffset = Math.floor((t - timestamps[-1]) / (3600 * 1000));
+      const hourOffset = Math.floor((t - timestamps[timestamps.length - 1]) / (3600 * 1000));
       if (hourOffset >= -24 && hourOffset < 72) {
         const graphIndex = hourOffset + 24; // インデックス調整（-24→0 に）
         dataset.pointRadius[graphIndex] = 6; // ← この点だけサイズ大きく
