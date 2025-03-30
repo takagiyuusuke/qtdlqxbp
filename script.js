@@ -310,7 +310,7 @@ function loadImagesFromSelectedTime() {
                     borderWidth: 3,
                     label: {
                       enabled: true,
-                      content: '0h',
+                      content: `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, '0')}-${String(t.getUTCDate()).padStart(2, '0')} ${String(t.getUTCHours()).padStart(2, '0')}:00 UTC`,
                       position: 'end',
                       backgroundColor: 'black',
                       color: 'white',
