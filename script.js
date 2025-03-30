@@ -189,7 +189,7 @@ function loadImagesFromSelectedTime() {
         return;
       }
 
-      const labels = Array.from({ length: 72 }, (_, i) => `+${i}h`);
+      const labels = Array.from({ length: 96 }, (_, i) => `+${i - 24}h`);
       const ctx = document.getElementById('flareChart').getContext('2d');
       const pointColors = flareData.map(value => {
         if (value == null) return 'gray'; // 欠損
@@ -203,7 +203,7 @@ function loadImagesFromSelectedTime() {
         window.flareChartInstance.data.labels = labels;
         window.flareChartInstance.data.datasets[0].data = flareData;
         window.flareChartInstance.data.datasets[0].pointBackgroundColor = pointColors;
-        
+
         window.flareChartInstance.update();
       } else {
         window.flareChartInstance = new Chart(ctx, {
