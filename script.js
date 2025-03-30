@@ -189,7 +189,7 @@ function loadImagesFromSelectedTime() {
         return;
       }
 
-      const labels = Array.from({ length: 96 }, (_, i) => `${i > 0 ? '+' : ''}${i - 24}h`);
+      const labels = Array.from({ length: 96 }, (_, i) => `${i > 24 ? '+' : ''}${i - 24}h`);
       const ctx = document.getElementById('flareChart').getContext('2d');
       const pointColors = flareData.map(value => {
         if (value == null) return 'gray'; // 欠損
