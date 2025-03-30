@@ -204,7 +204,8 @@ function loadImagesFromSelectedTime() {
             datasets: [{
               label: 'X-ray Flux (0.1–0.8 nm)',
               data: flareData,
-              borderColor: 'orange',
+              borderColor: 'black',
+              pointBackgroundColor: pointColors,
               fill: false
             }]
           },
@@ -212,11 +213,47 @@ function loadImagesFromSelectedTime() {
             scales: {
               y: {
                 type: 'logarithmic',
+                min: 1e-9,
+                max: 1e-3,
                 title: { display: true, text: 'Flux (W/m²)' }
               }
+            },
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => {
+                    const v = ctx.raw;
+                    if (v == null) return '欠損';
+                    const cls = v >= 1e-4 ? 'X' :
+                                v >= 1e-5 ? 'M' :
+                                v >= 1e-6 ? 'C' : 'O';
+                    return `Flux: ${v} W/m² (Class ${cls})`;
+                  }
+                }
+              }
             }
-          }
+          },
+          plugins: [{
+            id: 'backgroundZones',
+            beforeDraw: (chart) => {
+              const { ctx, chartArea, scales } = chart;
+              const zones = [
+                { from: 1e-4, to: 1e-3, color: 'rgba(255,0,0,0.15)' },     // X
+                { from: 1e-5, to: 1e-4, color: 'rgba(255,165,0,0.15)' },   // M
+                { from: 1e-6, to: 1e-5, color: 'rgba(0,255,0,0.15)' },     // C
+                { from: 1e-9, to: 1e-6, color: 'rgba(0,0,255,0.15)' }      // O
+              ];
+        
+              zones.forEach(zone => {
+                const y1 = scales.y.getPixelForValue(zone.from);
+                const y2 = scales.y.getPixelForValue(zone.to);
+                ctx.fillStyle = zone.color;
+                ctx.fillRect(chartArea.left, y2, chartArea.right - chartArea.left, y1 - y2);
+              });
+            }
+          }]
         });
+        
       }
     })
     .catch(err => {
