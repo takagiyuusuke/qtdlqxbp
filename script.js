@@ -204,6 +204,10 @@ function loadImagesFromSelectedTime() {
         window.flareChartInstance.data.datasets[0].data = flareData;
         window.flareChartInstance.data.datasets[0].pointBackgroundColor = pointColors;
 
+        const lastTimestamp = timestamps[timestamps.length - 1];
+        const formattedTime = `${lastTimestamp.getUTCFullYear()}-${String(lastTimestamp.getUTCMonth() + 1).padStart(2, '0')}-${String(lastTimestamp.getUTCDate()).padStart(2, '0')} ${String(lastTimestamp.getUTCHours()).padStart(2, '0')}:00 UTC`;
+        window.flareChartInstance.options.plugins.annotation.annotations.zeroHourLine.label.content = formattedTime;
+
         window.flareChartInstance.update();
       } else {
         window.flareChartInstance = new Chart(ctx, {
