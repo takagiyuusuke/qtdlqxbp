@@ -86,7 +86,7 @@ function updateHourSelector() {
     const disabled = (isToday && h > maxHour) ? 'disabled' : '';
     hourSelect.innerHTML += `<option value="${h}" ${disabled}>${h}</option>`;
   }
-  hourSelect.value = Math.min(currentValue, 23);
+  hourSelect.value = isToday ? maxHour : Math.min(currentValue, 23);
 }
 
 // ========== ロジック本体 ==========
