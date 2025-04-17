@@ -1,8 +1,8 @@
 // ========== 定数定義 ==========
 const wavelengths = ['0094', '0131', '0171', '0193', '0211', '0304', '0335', '1600', '4500'];
-const aiaBaseURL = 'https://hobbies-da-cathedral-collections.trycloudflare.com/get_aia?demo=true&url=';
-const hmiBaseURL = 'https://hobbies-da-cathedral-collections.trycloudflare.com/get_hmi?demo=true&url=';
-const flareBaseURL = 'https://hobbies-da-cathedral-collections.trycloudflare.com/get_flare_class?time=';
+const aiaBaseURL = 'https://there-improving-personalized-civic.trycloudflare.com/get_aia?demo=true&url=';
+const hmiBaseURL = 'https://there-improving-personalized-civic.trycloudflare.com/get_hmi?demo=true&url=';
+const flareBaseURL = 'https://there-improving-personalized-civic.trycloudflare.com/get_flare_class?time=';
 
 // ========== 初期化処理 ==========
 window.addEventListener('DOMContentLoaded', () => {
